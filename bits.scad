@@ -16,6 +16,7 @@ table_tray_z = bowl_r+wt;
 table_tray_corner_r = 10;
 
 lid_clearance = 0.2;
+lid_z = 20;
 
 if ((table_tray_x+2*wt+lid_clearance) > (box_inside_x-1)) echo("BOX TOO BIG OHNO");
 if ((table_tray_y+2*wt+lid_clearance) > (box_inside_y-1)) echo("BOX TOO BIG OHNO");
@@ -24,18 +25,17 @@ module bowl() {
     sphere(r=bowl_r);
 }
 
-module tray_hull(extra=0) {
+module tray_hull(z=table_tray_z, extra=0) {
     hull() {
-        translate([table_tray_corner_r,table_tray_corner_r,0]) cylinder(r=table_tray_corner_r, h= table_tray_z);
-        translate([table_tray_x-table_tray_corner_r,table_tray_corner_r,0]) cylinder(r=table_tray_corner_r, h= table_tray_z);
-        translate([table_tray_corner_r,table_tray_y-table_tray_corner_r,0]) cylinder(r=table_tray_corner_r, h= table_tray_z);
-        translate([table_tray_x-table_tray_corner_r,table_tray_y-table_tray_corner_r,0]) cylinder(r=table_tray_corner_r, h= table_tray_z);
+        translate([table_tray_corner_r,table_tray_corner_r,0]) cylinder(r=table_tray_corner_r+extra/2, h= z);
+        translate([table_tray_x-table_tray_corner_r,table_tray_corner_r,0]) cylinder(r=table_tray_corner_r+extra/2, h= z);
+        translate([table_tray_corner_r,table_tray_y-table_tray_corner_r,0]) cylinder(r=table_tray_corner_r+extra/2, h= z);
+        translate([table_tray_x-table_tray_corner_r,table_tray_y-table_tray_corner_r,0]) cylinder(r=table_tray_corner_r+extra/2, h= z);
     }
 }
 
 module table_tray() {
     difference() {
-//        cube([table_tray_x, table_tray_y, table_tray_z]);
         tray_hull();
         translate([wt+bowl_r, wt+bowl_r, table_tray_z])
             for (x = [0:bowls_x]) {
@@ -48,11 +48,11 @@ module table_tray() {
 
 module table_tray_lid() {
     difference() {
-        cube([table_tray_x+wt*2+lid_clearance, table_tray_y+wt*2+lid_clearance, table_tray_z]);
-        translate([wt+lid_clearance/2,wt+lid_clearance/2,wt]) cube([table_tray_x+lid_clearance, table_tray_y+lid_clearance, table_tray_z]);
+        tray_hull(lid_z, lid_clearance+2*wt);
+        translate([0,0,wt]) tray_hull(lid_z, lid_clearance);
     }
 }
 
 table_tray();
 
-// translate([table_tray_x+10, 0, 0]) table_tray_lid();
+translate([0, table_tray_y+10, 0]) table_tray_lid();
