@@ -18,8 +18,14 @@ table_tray_corner_r = 10;
 lid_clearance = 0.2;
 lid_z = 20;
 
-if ((table_tray_x+2*wt+lid_clearance) > (box_inside_x-1)) echo("BOX TOO BIG OHNO");
-if ((table_tray_y+2*wt+lid_clearance) > (box_inside_y-1)) echo("BOX TOO BIG OHNO");
+if ((table_tray_x+2*wt+lid_clearance) > (box_inside_x-1)) {
+    echo("BOX TOO BIG IN X OHNO");
+    echo((box_inside_x-1)-(table_tray_x+2*wt+lid_clearance));
+}
+if ((table_tray_y+2*wt+lid_clearance) > (box_inside_y-1)) {
+    echo("BOX TOO BIG IN Y OHNO");
+    echo((box_inside_x-y)-(table_tray_y+2*wt+lid_clearance));
+}
 
 module bowl() {
     sphere(r=bowl_r);
