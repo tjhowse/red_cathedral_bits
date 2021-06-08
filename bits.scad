@@ -1,20 +1,21 @@
 wt = 2;
 
-bowl_xy = 60;
+bowl_xy = 53;
 bowl_corner_r = 10;
 
 box_inside_x = 171;
 box_inside_y = 220;
+box_inside_z = 48;
+box_inside_avilable_z = 30;
 
-box_inside_z = 220;
-
-bowls_x = 4;
+bowls_x = 3;
 bowls_y = 2;
 
 table_tray_x = bowls_x*(bowl_xy+wt)+wt;
 table_tray_y = bowls_y*(bowl_xy+wt)+wt;
-table_tray_z = bowl_xy/2+wt;
-table_tray_corner_r = bowl_corner_r;
+// table_tray_z = bowl_xy/2+wt;
+table_tray_z = box_inside_avilable_z-wt;
+table_tray_corner_r = bowl_corner_r+wt;
 
 lid_clearance = 0.2;
 lid_z = 15;
@@ -30,19 +31,19 @@ if ((table_tray_y+2*wt+lid_clearance) > (box_inside_y-1)) {
 
 module bowl() {
     //sphere(r=bowl_xy/2);
-    offset = bowl_xy/2-bowl_corner_r;
+    offset_xy = bowl_xy/2-bowl_corner_r;
+    offset_z = table_tray_z-bowl_corner_r-wt;
     hull() {
-        translate([offset, offset, -offset]) sphere(r=bowl_corner_r);
-        translate([-offset, offset, -offset]) sphere(r=bowl_corner_r);
-        translate([offset, -offset, -offset]) sphere(r=bowl_corner_r);
-        translate([-offset, -offset, -offset]) sphere(r=bowl_corner_r);
+        translate([offset_xy, offset_xy, -offset_z]) sphere(r=bowl_corner_r);
+        translate([-offset_xy, offset_xy, -offset_z]) sphere(r=bowl_corner_r);
+        translate([offset_xy, -offset_xy, -offset_z]) sphere(r=bowl_corner_r);
+        translate([-offset_xy, -offset_xy, -offset_z]) sphere(r=bowl_corner_r);
 
-        translate([offset, offset, 100]) sphere(r=bowl_corner_r);
-        translate([-offset, offset, 100]) sphere(r=bowl_corner_r);
-        translate([offset, -offset, 100]) sphere(r=bowl_corner_r);
-        translate([-offset, -offset, 100]) sphere(r=bowl_corner_r);
+        translate([offset_xy, offset_xy, 100]) sphere(r=bowl_corner_r);
+        translate([-offset_xy, offset_xy, 100]) sphere(r=bowl_corner_r);
+        translate([offset_xy, -offset_xy, 100]) sphere(r=bowl_corner_r);
+        translate([-offset_xy, -offset_xy, 100]) sphere(r=bowl_corner_r);
     }
-
 }
 
 module tray_hull(z=table_tray_z, extra=0) {
@@ -57,12 +58,18 @@ module tray_hull(z=table_tray_z, extra=0) {
 module table_tray() {
     difference() {
         tray_hull();
-        translate([wt+bowl_xy/2, wt+bowl_xy/2, table_tray_z])
-            for (x = [0:bowls_x]) {
-                for (y = [0:bowls_y]) {
+        translate([wt+bowl_xy/2, wt+bowl_xy/2, table_tray_z]) {
+            for (x = [0:bowls_x-1]) {
+                for (y = [0:bowls_y-1]) {
                     translate([x*(wt+bowl_xy), y*(wt+bowl_xy),0]) bowl();
                 }
             }
+            // for (x = [2:2]) {
+            //     for (y = [0:bowls_y+1]) {
+            //         translate([x*(wt+bowl_xy), (y*(wt+bowl_xy))/2-(wt+bowl_xy)/4,0]) scale([1,0.5,1]) #bowl();
+            //     }
+            // }
+        }
     }
 }
 
@@ -73,6 +80,11 @@ module table_tray_lid() {
     }
 }
 
-table_tray();
+difference() {
 
-translate([0, table_tray_y+10, 0]) table_tray_lid();
+    table_tray();
+    // translate([20,0,0]) cube([100,100,100]);
+}
+// translate([0, table_tray_y+10, 0]) table_tray_lid();
+
+// %cube([box_inside_x,box_inside_y,box_inside_z]);
