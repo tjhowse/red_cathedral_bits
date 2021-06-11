@@ -1,20 +1,25 @@
 wt = 2;
 
-bowl_xy = 53;
 bowl_corner_r = 10;
 
 box_inside_x = 171;
 box_inside_y = 220;
 box_inside_z = 48;
-box_inside_avilable_z = 30;
+// This is the amount of vertical space available when the box contains
+// the player boards, the main board and one copy of the manual.
+box_inside_avilable_z = 29;
+
+// Leave this much space between the outside of the lid and the inside of the box.
+box_inside_clearance = 1;
 
 bowls_x = 3;
 bowls_y = 2;
 
+bowl_xy = (box_inside_x-box_inside_clearance-2*wt-(bowls_x+1)*wt)/bowls_x;
+
 table_tray_x = bowls_x*(bowl_xy+wt)+wt;
 table_tray_y = bowls_y*(bowl_xy+wt)+wt;
-// table_tray_z = bowl_xy/2+wt;
-table_tray_z = box_inside_avilable_z-wt;
+table_tray_z = box_inside_avilable_z-wt-box_inside_clearance;
 table_tray_corner_r = bowl_corner_r+wt;
 
 lid_clearance = 0.2;
@@ -29,20 +34,19 @@ if ((table_tray_y+2*wt+lid_clearance) > (box_inside_y-1)) {
     echo((box_inside_x-y)-(table_tray_y+2*wt+lid_clearance));
 }
 
-module bowl() {
-    //sphere(r=bowl_xy/2);
+module bowl(y_scale=1) {
     offset_xy = bowl_xy/2-bowl_corner_r;
     offset_z = table_tray_z-bowl_corner_r-wt;
     hull() {
-        translate([offset_xy, offset_xy, -offset_z]) sphere(r=bowl_corner_r);
-        translate([-offset_xy, offset_xy, -offset_z]) sphere(r=bowl_corner_r);
-        translate([offset_xy, -offset_xy, -offset_z]) sphere(r=bowl_corner_r);
-        translate([-offset_xy, -offset_xy, -offset_z]) sphere(r=bowl_corner_r);
+        translate([offset_xy, offset_xy*y_scale, -offset_z]) sphere(r=bowl_corner_r);
+        translate([-offset_xy, offset_xy*y_scale, -offset_z]) sphere(r=bowl_corner_r);
+        translate([offset_xy, -offset_xy*y_scale, -offset_z]) sphere(r=bowl_corner_r);
+        translate([-offset_xy, -offset_xy*y_scale, -offset_z]) sphere(r=bowl_corner_r);
 
-        translate([offset_xy, offset_xy, 100]) sphere(r=bowl_corner_r);
-        translate([-offset_xy, offset_xy, 100]) sphere(r=bowl_corner_r);
-        translate([offset_xy, -offset_xy, 100]) sphere(r=bowl_corner_r);
-        translate([-offset_xy, -offset_xy, 100]) sphere(r=bowl_corner_r);
+        translate([offset_xy, offset_xy*y_scale, 100]) sphere(r=bowl_corner_r);
+        translate([-offset_xy, offset_xy*y_scale, 100]) sphere(r=bowl_corner_r);
+        translate([offset_xy, -offset_xy*y_scale, 100]) sphere(r=bowl_corner_r);
+        translate([-offset_xy, -offset_xy*y_scale, 100]) sphere(r=bowl_corner_r);
     }
 }
 
@@ -59,16 +63,19 @@ module table_tray() {
     difference() {
         tray_hull();
         translate([wt+bowl_xy/2, wt+bowl_xy/2, table_tray_z]) {
-            for (x = [0:bowls_x-1]) {
+            // Big bowls.
+            for (x = [0:bowls_x-2]) {
                 for (y = [0:bowls_y-1]) {
                     translate([x*(wt+bowl_xy), y*(wt+bowl_xy),0]) bowl();
                 }
             }
-            // for (x = [2:2]) {
-            //     for (y = [0:bowls_y+1]) {
-            //         translate([x*(wt+bowl_xy), (y*(wt+bowl_xy))/2-(wt+bowl_xy)/4,0]) scale([1,0.5,1]) #bowl();
-            //     }
-            // }
+            // Little bowls.
+            for (x = [2:2]) {
+                for (y = [0:bowls_y+1]) {
+                    // Enjoy this magic 1/6, future reader. Best of luck.
+                    translate([x*(wt+bowl_xy), (y*(wt+bowl_xy))/2-(wt+bowl_xy)/4,0]) bowl(1/6);
+                }
+            }
         }
     }
 }
@@ -80,11 +87,5 @@ module table_tray_lid() {
     }
 }
 
-difference() {
-
-    table_tray();
-    // translate([20,0,0]) cube([100,100,100]);
-}
-// translate([0, table_tray_y+10, 0]) table_tray_lid();
-
-// %cube([box_inside_x,box_inside_y,box_inside_z]);
+// table_tray();
+translate([0, table_tray_y+10, 0]) table_tray_lid();
