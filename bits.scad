@@ -105,7 +105,7 @@ module table_tray() {
             // Little bowls.
             for (x = [2:2]) {
                 for (y = [0:bowls_y+1]) {
-                    translate([x*(wt+bowl_xy), (y*(wt+bowl_xy))/2-(wt+bowl_xy)/4,0])  bowl(bowl_xy, bowl_xy/2-wt, bowl_corner_r);
+                    translate([x*(wt+bowl_xy), (y*(wt+bowl_xy))/2-(wt+bowl_xy)/4,0])  bowl(bowl_xy, (bowl_xy-wt)/2, bowl_corner_r);
                 }
             }
         }
