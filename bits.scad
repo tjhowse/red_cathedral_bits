@@ -66,19 +66,20 @@ if ((table_tray_y+2*wt+lid_clearance) > (box_inside_y-1)) {
     echo((box_inside_x-y)-(table_tray_y+2*wt+lid_clearance));
 }
 
-module bowl(y_scale=1) {
-    offset_xy = bowl_xy/2-bowl_corner_r;
-    offset_z = -bowl_corner_r-wt;
+module bowl(x, y, r, z=0) {
+    offset_x = x/2-r;
+    offset_y = y/2-r;
+    offset_z = z-bowl_corner_r-wt;
     hull() {
-        translate([offset_xy, offset_xy*y_scale, -offset_z]) sphere(r=bowl_corner_r);
-        translate([-offset_xy, offset_xy*y_scale, -offset_z]) sphere(r=bowl_corner_r);
-        translate([offset_xy, -offset_xy*y_scale, -offset_z]) sphere(r=bowl_corner_r);
-        translate([-offset_xy, -offset_xy*y_scale, -offset_z]) sphere(r=bowl_corner_r);
+        translate([offset_x, offset_y, -offset_z]) sphere(r=r);
+        translate([-offset_x, offset_y, -offset_z]) sphere(r=r);
+        translate([offset_x, -offset_y, -offset_z]) sphere(r=r);
+        translate([-offset_x, -offset_y, -offset_z]) sphere(r=r);
 
-        translate([offset_xy, offset_xy*y_scale, 100]) sphere(r=bowl_corner_r);
-        translate([-offset_xy, offset_xy*y_scale, 100]) sphere(r=bowl_corner_r);
-        translate([offset_xy, -offset_xy*y_scale, 100]) sphere(r=bowl_corner_r);
-        translate([-offset_xy, -offset_xy*y_scale, 100]) sphere(r=bowl_corner_r);
+        translate([offset_x, offset_y, 100]) sphere(r=r);
+        translate([-offset_x, offset_y, 100]) sphere(r=r);
+        translate([offset_x, -offset_y, 100]) sphere(r=r);
+        translate([-offset_x, -offset_y, 100]) sphere(r=r);
     }
 }
 
@@ -98,14 +99,13 @@ module table_tray() {
             // Big bowls.
             for (x = [0:bowls_x-2]) {
                 for (y = [0:bowls_y-1]) {
-                    translate([x*(wt+bowl_xy), y*(wt+bowl_xy),0]) bowl();
+                    translate([x*(wt+bowl_xy), y*(wt+bowl_xy),0]) bowl(bowl_xy, bowl_xy, bowl_corner_r);
                 }
             }
             // Little bowls.
             for (x = [2:2]) {
                 for (y = [0:bowls_y+1]) {
-                    // Enjoy this magic 1/6, future reader. Best of luck.
-                    translate([x*(wt+bowl_xy), (y*(wt+bowl_xy))/2-(wt+bowl_xy)/4,0]) bowl(1/6);
+                    translate([x*(wt+bowl_xy), (y*(wt+bowl_xy))/2-(wt+bowl_xy)/4,0])  bowl(bowl_xy, bowl_xy/2-wt, bowl_corner_r);
                 }
             }
         }
@@ -151,7 +151,7 @@ module box_tray() {
     }
 }
 
-// table_tray();
+table_tray();
 // translate([0, table_tray_y+10, 0]) table_tray_lid();
 // box_tray();
-removable_small_bowl();
+// removable_small_bowl();
